@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 3.26)
 
 project(interplation
   LANGUAGES
-    Fortran  
+    Fortran
+    Python
 )
 
 # Set cmake paths up in my preferred way. This makes it easier to find/link against
