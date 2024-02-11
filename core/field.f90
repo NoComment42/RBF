@@ -9,10 +9,14 @@ module field_mod
     private
     real(c_double), dimension(:,:), allocatable :: vertices
     real(c_double), dimension(:), allocatable :: scalar
+    integer(c_int) :: num_points
   contains
     procedure, pass :: init => sf_init
+    procedure, pass :: count => sf_count
     procedure, pass :: get_vertex => sf_get_vertex
+    procedure, pass :: get_vertices => sf_get_vertices
     procedure, pass :: get_value => sf_get_value
+    procedure, pass :: get_values => sf_get_values
   end type
 
   interface scalar_field
@@ -44,11 +48,25 @@ contains
     ! dummy vars
     class(scalar_field), intent(inout) :: this
     real(c_double), dimension(:,:), intent(in) :: vertices
-    real(c_double), dimension(size(vertices,1)), intent(in) :: scalar
+    real(c_double), dimension(:), intent(in) :: scalar
     !
     allocate( this%vertices, source=vertices)
     this%scalar = scalar
+    this%num_points = size(vertices,2)
   end subroutine sf_init
+
+  !> Returns the number of points in the field.
+  !!
+  !! @result (int) The number of points in this field.
+  function sf_count (this) result(count)
+    ! dummy vars
+    class(scalar_field), intent(in) :: this
+    ! result
+    integer(c_int) :: count
+    !
+    count = this%num_points
+  end function sf_count
+
 
   function sf_get_vertex (this, i) result(vertex)
     ! dummy vars
@@ -60,6 +78,17 @@ contains
     vertex = this%vertices(:,i)
   end function sf_get_vertex
 
+
+  function sf_get_vertices (this) result(vertices)
+    ! dummy vars
+    class(scalar_field), intent(in) :: this
+    ! result
+    real(c_double), dimension(:,:), allocatable :: vertices
+    !
+    vertices = this%vertices
+  end function sf_get_vertices
+
+
   function sf_get_value (this, i) result(val)
     ! dummy vars
     class(scalar_field), intent(in) :: this
@@ -69,5 +98,15 @@ contains
     !
     val = this%scalar(i)
   end function sf_get_value
+
+
+  function sf_get_values (this) result(vals)
+    ! dummy vars
+    class(scalar_field), intent(in) :: this
+    ! result
+    real(c_double), dimension(size(this%scalar)) :: vals
+    !
+    vals = this%scalar
+  end function sf_get_values
 
 end module field_mod

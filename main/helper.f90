@@ -4,7 +4,7 @@ module helper_mod
   implicit none
   private
 
-  public :: make_regular_box, write_points
+  public :: make_regular_box, write_points, write_points_wscalar
 
 contains
 
@@ -53,5 +53,24 @@ contains
     write(fid,'(2(ES15.7,",",X),ES15.7)') (points(:,i), i=1,npts)
     close(fid)
   end subroutine write_points
+
+  subroutine write_points_wscalar (filename, points, scalar)
+    ! dummy vars
+    character(len=*), intent(in) :: filename
+    real(c_double), dimension(:,:), intent(in) :: points
+    real(c_double), dimension(:), intent(in) :: scalar
+    ! local
+    integer :: fid, i, npts
+    !
+    open(newunit=fid, file=trim(filename), status='unknown', action='write')
+
+    npts = size(points,2)
+
+    write(fid,'("x,y,z,var1")')
+    do i=1,npts
+      write(fid,'(3(ES15.7,",",X),ES15.7)') points(:,i), scalar(i)
+    end do
+    close(fid)
+  end subroutine write_points_wscalar
 
 end module helper_mod

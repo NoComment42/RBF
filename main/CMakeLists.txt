@@ -8,4 +8,5 @@ target_sources(interpolator
 target_link_libraries(interpolator
   PRIVATE
     core
+    rbf
 )
