@@ -84,16 +84,15 @@ contains
     ! dummy vars
     class(rbf_interp), intent(inout) :: this
     ! local
-    integer(c_int) :: i, j, npts, info
+    integer(c_int) :: i, j
+    integer :: info, npts
     real(c_double), dimension(3) :: p1, p2
-    real(c_double), dimension(:), allocatable :: rhs, ipiv
-    real(c_double), dimension(:,:), allocatable :: rbf
+    integer, dimension(:), allocatable :: ipiv
+    real(c_double), dimension(:,:), allocatable :: rbf, rhs
     !
-    external dgesv
-
     npts = this%field%count()
 
-    allocate( rhs(npts) )
+    allocate( rhs(npts,1) )
     allocate( ipiv(npts) )
     allocate( rbf(npts,npts) )
 
@@ -106,13 +105,50 @@ contains
         !write(*,*) i, j, this%radius(p1,p2), rbf(i,j)
       end do
 
-      rhs(i) = this%field%get_value(i)
+      rhs(i,1) = this%field%get_value(i)
     end do
     
     ! Solve linear system RBF*weights = RHS
-    call dgesv(npts,1,rbf,npts,ipiv,rhs,npts, info)
+    call getrf(rbf, ipiv, info)
+    call getrs(rbf, ipiv, rhs, info=info)
   end subroutine calc_weights
 
+  subroutine solve ()
+    use lapack95
+    real(c_double), dimension(5,5) :: &
+    a=reshape( (/ 6.80,-2.11, 5.66, 5.97, 8.23, &
+                 -6.05,-3.30, 5.36,-4.44, 1.08, &
+                 -0.45, 2.58,-2.70, 0.27, 9.04, &
+                  8.32, 2.71, 4.35,-7.17, 2.14, &
+                 -9.67,-5.14,-7.26, 6.08,-6.87 /), &
+                 (/5,5/) )
+    real(c_double), dimension(5,3) :: &
+    b=reshape( (/ 4.02, 6.19,-8.22,-7.57,-3.03, &
+                 -1.56, 4.00,-8.67, 1.75, 2.86, &
+                  9.81,-4.09,-4.57,-8.61, 8.99 /), &
+                  (/5,3/) )
+    integer, dimension(5) :: ipiv
+    integer :: info, j
+
+    !call dgesv(5, 3, a, 5, ipiv, b, 5, info)
+    call getrf(a, ipiv, info)
+
+    write(*,*) info
+    if (info .gt. 0) then
+      write(*,'( "u(" ,I3, ",", I3, ") is zero" )') info, info
+    end if
+    write(*,'(5(i3, " "))') ipiv
+
+    call getrs(a, ipiv, b, info=info)
+
+    write(*,*) info
+    if (info .gt. 0) then
+      write(*,'( "u(" ,I3, ",", I3, ") is zero" )') info, info
+    end if
+    write(*,'(5(i3, " "))') ipiv
+
+    write(*,'(3(ES15.7, " "))') ( b(j,:), j=1,5)
+  end subroutine solve
 
   function radius (p1, p2) result(rad)
     ! dummy vars
