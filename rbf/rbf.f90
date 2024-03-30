@@ -80,17 +80,21 @@ contains
 
 
   subroutine calc_weights (this) 
+    use lapack95
     ! dummy vars
     class(rbf_interp), intent(inout) :: this
     ! local
-    integer(c_int) :: i, j, npts
+    integer(c_int) :: i, j, npts, info
     real(c_double), dimension(3) :: p1, p2
-    real(c_double), dimension(:), allocatable :: rhs
+    real(c_double), dimension(:), allocatable :: rhs, ipiv
     real(c_double), dimension(:,:), allocatable :: rbf
     !
+    external dgesv
+
     npts = this%field%count()
 
     allocate( rhs(npts) )
+    allocate( ipiv(npts) )
     allocate( rbf(npts,npts) )
 
     do i=1, npts
@@ -106,7 +110,7 @@ contains
     end do
     
     ! Solve linear system RBF*weights = RHS
-    
+    call dgesv(npts,1,rbf,npts,ipiv,rhs,npts, info)
   end subroutine calc_weights
 
 
