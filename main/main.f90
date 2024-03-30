@@ -28,7 +28,7 @@ program interpolation
   call field%init(box,scalar)
   call write_points_wscalar("field.csv", field%get_vertices(), field%get_values())
 
-  write(stdout,*) "Setupd radial basis function interpolator....."
+  write(stdout,*) "Setup radial basis function interpolator....."
   call rbf%init(field)
 
 end program
