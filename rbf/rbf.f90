@@ -136,6 +136,38 @@ contains
     write(*,*) this%weights
   end subroutine calc_weights
 
+  function radius (p1, p2) result(rad)
+    ! dummy vars
+    real(c_double), dimension(3), intent(in) :: p1, p2
+    ! result
+    real(c_double) :: rad
+    !
+    rad = norm2(p2-p1)
+  end function radius
+
+!*************** Multiquadric Radial Basis Function ***************!
+
+  subroutine mq_set_r0 (this,r0)
+    ! dummy vars
+    class(multiquadric), intent(inout) :: this
+    real(c_double), intent(in) :: r0
+    !
+    this%r0 = r0
+  end subroutine mq_set_r0
+
+  function mq_rbf (this, dist) result(val)
+    ! dummy vars
+    class(multiquadric), intent(in) :: this
+    real(c_double), intent(in) :: dist
+    ! result
+    real(c_double) :: val
+    !
+    val = sqrt(dist**2 + this%r0**2)
+  end function
+
+
+
+!*************** Test procedure for MKL **************************!
   subroutine solve ()
     use lapack95
     real(c_double), dimension(5,5) :: &
@@ -173,32 +205,4 @@ contains
     write(*,'(3(ES15.7, " "))') ( b(j,:), j=1,5)
   end subroutine solve
 
-  function radius (p1, p2) result(rad)
-    ! dummy vars
-    real(c_double), dimension(3), intent(in) :: p1, p2
-    ! result
-    real(c_double) :: rad
-    !
-    rad = norm2(p2-p1)
-  end function radius
-
-!*************** Multiquadric Radial Basis Function ***************!
-
-  subroutine mq_set_r0 (this,r0)
-    ! dummy vars
-    class(multiquadric), intent(inout) :: this
-    real(c_double), intent(in) :: r0
-    !
-    this%r0 = r0
-  end subroutine mq_set_r0
-
-  function mq_rbf (this, dist) result(val)
-    ! dummy vars
-    class(multiquadric), intent(in) :: this
-    real(c_double), intent(in) :: dist
-    ! result
-    real(c_double) :: val
-    !
-    val = sqrt(dist**2 + this%r0**2)
-  end function
-end module rbf_mod
+  end module rbf_mod
