@@ -3,6 +3,7 @@ add_library(rbf)
 target_sources(rbf
   PUBLIC
     rbf.f90
+    inverse_multiquadric.f90
 )
 
 target_link_libraries(rbf

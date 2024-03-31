@@ -24,7 +24,7 @@ def main():
 
   # pass into radial basis function interpolator
   rbf = interp.RBFInterpolator(field['points'],field['values'], 
-                               kernel='multiquadric', epsilon=1.0,
+                               kernel='inverse_multiquadric', epsilon=1.0,
                                degree=-1)
   check = rbf(tests['points'])
   check = np.array(check)

@@ -5,7 +5,7 @@ module rbf_mod
   implicit none
   private
 
-  public :: rbf_function, rbf_interp, rbf_multiquadric
+  public :: rbf_function, rbf_interp, multiquadric
 
   type, abstract :: rbf_function
   contains
@@ -25,7 +25,7 @@ module rbf_mod
     end function
   end interface
 
-  type, extends(rbf_function) :: rbf_multiquadric
+  type, extends(rbf_function) :: multiquadric
     private
     real(c_double) :: r0 = 1.0_c_double
   contains
@@ -56,7 +56,7 @@ contains
     class(rbf_function), intent(in), optional :: func
     logical, intent(in), optional :: norm
     ! local
-    type(rbf_multiquadric) :: default
+    type(multiquadric) :: default
     !
     this%field = field
 
@@ -186,7 +186,7 @@ contains
 
   subroutine mq_set_r0 (this,r0)
     ! dummy vars
-    class(rbf_multiquadric), intent(inout) :: this
+    class(multiquadric), intent(inout) :: this
     real(c_double), intent(in) :: r0
     !
     this%r0 = r0
@@ -194,7 +194,7 @@ contains
 
   function mq_rbf (this, dist) result(val)
     ! dummy vars
-    class(rbf_multiquadric), intent(in) :: this
+    class(multiquadric), intent(in) :: this
     real(c_double), intent(in) :: dist
     ! result
     real(c_double) :: val

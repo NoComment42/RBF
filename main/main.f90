@@ -3,6 +3,7 @@ program interpolation
   use iso_fortran_env, only: stdout => output_unit
   use field_mod
   use rbf_mod
+  use inverse_multiquadric_mod
   use helper_mod
   implicit none
 
@@ -23,6 +24,7 @@ program interpolation
   real(c_double), dimension(:), allocatable :: scalar, vals
   type(scalar_field) :: field
   type(rbf_interp) :: rbf, rbf_normed
+  type(inverse_multiquadric) :: inv_mq
 
 
   write(stdout,*) "Starting interpolation test bed!"
@@ -43,8 +45,8 @@ program interpolation
   call write_points_wscalar("field.csv", field%get_vertices(), field%get_values())
 
   write(stdout,*) "Setup radial basis function interpolator....."
-  call rbf%init(field,norm=.false.)
-  call rbf_normed%init(field,norm=.true.)
+  call rbf%init(field, func=inv_mq , norm=.false.)
+  call rbf_normed%init(field, func=inv_mq, norm=.true.)
 
   write(stdout,*) "Test interpolators"
   
