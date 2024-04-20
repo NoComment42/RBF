@@ -45,11 +45,14 @@ module rbf_mod
     procedure, private, pass :: calc_weights
     procedure, private, nopass :: radius
   end type rbf_interp
+
   type, extends(rbf_interp) :: rbf_interp_ext
     private
+    integer(c_int) :: degree = 0
     real(c_double), dimension(:), allocatable :: poly_weights
   contains
-    procedure, pass :: calc_weights => calc_weights_rbfe
+    procedure, private, pass :: calc_weights => calc_weights_rbfe
+    procedure, private, pass :: eval_poly_rbfe
   end type
 
   interface
@@ -84,6 +87,14 @@ module rbf_mod
       ! dummy vars
       class(rbf_interp_ext), intent(inout) :: this
     end subroutine calc_weights_rbfe    
+
+    module subroutine eval_poly_rbfe (this, x, poly)
+      import, all
+      ! dummy vars
+      class(rbf_interp_ext), intent(in) :: this
+      real(c_double), dimension(:), intent(in) :: x
+      real(c_double), dimension(:), allocatable, intent(out) :: poly
+    end subroutine
 
   end interface
 

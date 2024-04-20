@@ -45,6 +45,7 @@ program interpolation
   call write_points_wscalar("field.csv", field%get_vertices(), field%get_values())
 
   write(stdout,*) "Setup radial basis function interpolator....."
+  call inv_mq%set_r0(.5_c_double)
   call rbf%init(field, func=inv_mq , norm=.false.)
   call rbf_normed%init(field, func=inv_mq, norm=.true.)
 

@@ -19,6 +19,14 @@ contains
     allocate( rhs(npts,1) )
     allocate( ipiv(npts) )
     allocate( rbf(npts,npts) )   
-  end subroutine
+  end subroutine calc_weights_rbfe
+
+  module subroutine eval_poly_rbfe (this, x, poly)
+    ! dummy vars
+    class(rbf_interp_ext), intent(in) :: this
+    real(c_double), dimension(:), intent(in) :: x
+    real(c_double), dimension(:), allocatable, intent(out) :: poly
+
+  end subroutine eval_poly_rbfe
 
 end submodule rbf_extended
