@@ -40,7 +40,8 @@ module rbf_mod
     real(c_double), dimension(:), allocatable :: weights
     logical :: norm = .false.
   contains
-    procedure, pass :: init
+    generic :: init => init_rbf
+    procedure, pass :: init_rbf
     procedure, pass :: interp
     procedure, private, pass :: calc_weights
     procedure, private, nopass :: radius
@@ -51,19 +52,21 @@ module rbf_mod
     integer(c_int) :: degree = 0
     real(c_double), dimension(:), allocatable :: poly_weights
   contains
+    generic :: init => init_rbfe
+    procedure, pass :: init_rbfe
     procedure, private, pass :: calc_weights => calc_weights_rbfe
     procedure, private, pass :: eval_poly_rbfe
   end type
 
   interface
-    module subroutine init (this, field, func, norm)
+    module subroutine init_rbf (this, field, func, norm)
       import, all
       ! dummy vars
       class(rbf_interp), intent(inout) :: this
       class(scalar_field), intent(in) :: field
       class(rbf_function), intent(in), optional :: func
       logical, intent(in), optional :: norm
-    end subroutine init
+    end subroutine init_rbf
 
     module function interp (this, pt) result(val)
       import, all
@@ -81,6 +84,17 @@ module rbf_mod
       class(rbf_interp), intent(inout) :: this
     end subroutine calc_weights
 
+    !*********** Radial basis function extended procedures
+    module subroutine init_rbfe (this, field, degree, func, norm)
+      import, all
+      ! dummy vars
+      class(rbf_interp_ext), intent(inout) :: this
+      class(scalar_field), intent(in) :: field
+      integer(c_int), intent(in) :: degree
+      class(rbf_function), intent(in), optional :: func
+      logical, intent(in), optional :: norm
+    end subroutine init_rbfe
+
     module subroutine calc_weights_rbfe (this)
       use lapack95
       import, all
@@ -88,13 +102,14 @@ module rbf_mod
       class(rbf_interp_ext), intent(inout) :: this
     end subroutine calc_weights_rbfe    
 
-    module subroutine eval_poly_rbfe (this, x, poly)
+    module function eval_poly_rbfe (this, x) result(res)
       import, all
       ! dummy vars
       class(rbf_interp_ext), intent(in) :: this
-      real(c_double), dimension(:), intent(in) :: x
-      real(c_double), dimension(:), allocatable, intent(out) :: poly
-    end subroutine
+      real(c_double), dimension(3), intent(in):: x
+      ! result
+      real(c_double) :: res
+    end function eval_poly_rbfe
 
   end interface
 

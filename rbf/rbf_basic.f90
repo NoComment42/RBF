@@ -1,7 +1,7 @@
 submodule (rbf_mod) rbf_basic
 contains
 
-module subroutine init (this, field, func, norm)
+module subroutine init_rbf (this, field, func, norm)
   ! dummy vars
   class(rbf_interp), intent(inout) :: this
   class(scalar_field), intent(in) :: field
@@ -20,7 +20,7 @@ module subroutine init (this, field, func, norm)
   if (present(norm)) this%norm = norm
 
   call this%calc_weights()
-end subroutine init
+end subroutine init_rbf
 
 
 module function interp (this, pt) result(val)
